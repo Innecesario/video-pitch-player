@@ -1,0 +1,369 @@
+/* ── Reset ───────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+}
+
+/* ── Tokens ──────────────────────────────────────────────── */
+:root {
+  --bg:         #0f0f0f;
+  --surface:    #1a1a1a;
+  --surface2:   #232323;
+  --border:     #2e2e2e;
+  --text:       #d4d4d4;
+  --text-dim:   #666;
+  --accent:     #e8a020;
+  --accent-dim: #7a5010;
+  --led:        #39ff6a;
+  --led-glow:   rgba(57,255,106,0.25);
+  --radius:     8px;
+  --radius-lg:  12px;
+  --font-ui:    'Segoe UI', system-ui, sans-serif;
+  --font-mono:  'Consolas', 'Courier New', monospace;
+}
+
+/* ── Base ────────────────────────────────────────────────── */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  overflow: hidden;
+  height: 100vh;
+  user-select: none;
+}
+
+/* ── Layout ──────────────────────────────────────────────── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 12px;
+  gap: 8px;
+}
+
+/* ── Video ───────────────────────────────────────────────── */
+#video-container {
+  flex: 1;
+  background: #000;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 180px;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+#video-container::before {
+  content: '▶';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: #1e1e1e;
+  pointer-events: none;
+}
+
+#video {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Progress ────────────────────────────────────────────── */
+#progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 2px;
+}
+
+#timeCurrent, #timeTotal {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  min-width: 40px;
+  letter-spacing: 0.05em;
+}
+
+#timeTotal { color: #444; }
+
+#progressBar {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--surface2);
+  border-radius: 2px;
+  cursor: pointer;
+  outline: none;
+  transition: height 0.15s;
+}
+
+#progressBar:hover { height: 6px; }
+
+#progressBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 0 6px var(--accent-dim);
+  transition: transform 0.1s;
+}
+
+#progressBar::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+/* ── Open row ────────────────────────────────────────────── */
+#open-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 2px;
+  overflow: hidden;
+}
+
+/* ── Transport row ───────────────────────────────────────── */
+#transport-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 10px 16px;
+}
+
+/* Grupos de skip pegados */
+.skip-group {
+  display: flex;
+  align-items: center;
+}
+
+.skip-group button:first-child {
+  border-radius: var(--radius) 0 0 var(--radius);
+  border-right-width: 0;
+}
+
+.skip-group button:last-child {
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+/* Play + Stop */
+.play-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Buttons base ────────────────────────────────────────── */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 14px;
+  border: 1px solid #3a3a3a;
+  border-radius: var(--radius);
+  background: #2a2a2a;
+  color: #bbb;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s, color 0.1s, box-shadow 0.1s;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+button:hover {
+  background: #333;
+  border-color: #505050;
+  color: #ddd;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+button:active {
+  background: #1e1e1e;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+  transform: translateY(1px);
+}
+
+button span {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* Open */
+#btnOpen {
+  background: #2a1f00;
+  border-color: #5a3e00;
+  color: var(--accent);
+  font-weight: 600;
+  padding: 7px 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,200,50,0.08);
+}
+#btnOpen:hover {
+  background: #3a2a00;
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(232,160,32,0.15), inset 0 1px 0 rgba(255,200,50,0.1);
+}
+
+/* Play */
+#btnPlay {
+  background: #0f2e0f;
+  border-color: #1e5a1e;
+  color: #4ec94e;
+  min-width: 90px;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5), inset 0 1px 0 rgba(100,255,100,0.06);
+}
+#btnPlay:hover {
+  background: #163d16;
+  border-color: #2d8b2d;
+  color: #6fdf6f;
+  box-shadow: 0 0 12px rgba(78,201,78,0.2), inset 0 1px 0 rgba(100,255,100,0.1);
+}
+#btnPlay:active { background: #0a200a; }
+
+/* Stop */
+#btnStop {
+  color: #777;
+  padding: 8px 12px;
+  font-size: 15px;
+}
+#btnStop:hover {
+  color: #e05050;
+  border-color: #803030;
+  background: #2a1010;
+}
+
+/* Skip */
+.skip-group button {
+  padding: 8px 12px;
+  color: #888;
+  font-size: 13px;
+  background: #222;
+  border-color: #383838;
+}
+.skip-group button:hover {
+  color: #ccc;
+  background: #2e2e2e;
+  border-color: #505050;
+}
+
+/* ── Bottom row ──────────────────────────────────────────── */
+#bottom-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+#pitch-block, #speed-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 8px 14px;
+}
+
+#pitch-block { flex: 1; }
+#speed-block { flex: 0 0 auto; }
+
+.label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+#btnPitchDn, #btnPitchUp {
+  width: 32px; height: 32px;
+  padding: 0;
+  font-size: 16px;
+  border-radius: 50%;
+}
+#btnPitchDn:hover { border-color: #903030; color: #e05050; background: #2a1010; }
+#btnPitchUp:hover { border-color: #207a20; color: #4ec94e; background: #0f2a0f; }
+
+/* Display LED */
+#lblPitch {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--led);
+  text-shadow: 0 0 8px var(--led-glow), 0 0 20px var(--led-glow);
+  min-width: 46px;
+  text-align: center;
+  letter-spacing: -0.02em;
+  background: #0a0a0a;
+  border: 1px solid #1a2e1a;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+#pitchUnit {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+select {
+  padding: 6px 26px 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+select:hover { border-color: var(--accent); }
+
+/* ── File name (junto a Open) ───────────────────────────────── */
+#fileName {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-left: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+}
+
+/* ── Reset buttons (pitch / speed) ──────────────────────────── */
+#btnPitchReset, #btnSpeedReset {
+  width: 26px; height: 26px;
+  padding: 0;
+  font-size: 13px;
+  border-radius: 50%;
+  color: var(--text-dim);
+  margin-left: 2px;
+  background: transparent;
+  box-shadow: none;
+}
+#btnPitchReset:hover, #btnSpeedReset:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: #2a1f00;
+}
+
+/* ── Select activo (velocidad distinta de 100%) ─────────────── */
+select.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 8px rgba(232,160,32,0.15), inset 0 1px 0 rgba(255,200,50,0.06);
+}
